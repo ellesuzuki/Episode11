@@ -23,6 +23,8 @@ describe "The Api" do
     log_request.fetch("text").should eq("Hello World")
     time_in_utc = Time.parse(log_request.fetch("time"))
     time_in_utc.should be_within(1).of(6.seconds.ago.utc)
+    exec_time = log_request.fetch('execution_time')
+    exec_time.should be_within(0.5).of(6.seconds)
   end
 
   it "not be ok with /wack" do
@@ -42,6 +44,10 @@ describe LogRequest do
   it "should keep the time" do
     subject.time.should be_within(0.01).of(45.minutes.ago)
   end
+  it 'should have an execution time' do
+    subject.should respond_to(:execution_time)
+    subject.execution_time.should be_within(0.5).of(45.minutes)
+  end
 
   describe ":log" do
     before do
@@ -49,17 +55,16 @@ describe LogRequest do
       LogRequest.log_request(Time.now, "Now")
       LogRequest.log_request(Time.now, "Now")
     end
+
     it "should be an array-like thing" do
       LogRequest.log.count.should eq(2)
     end
-    it "should request LogRequest" do
+    it "should return a LogRequest" do
       LogRequest.log.first.should be_a(LogRequest)
     end
-
     it "can clear out the log" do
       LogRequest.clear_log!
       LogRequest.log.should be_empty
     end
-
   end
 end
