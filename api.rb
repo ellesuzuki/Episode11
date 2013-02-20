@@ -14,7 +14,7 @@ class LogRequest
     @text = text
     @time = time
     @created_at = Time.now
-    @execution_time = @created_at - @time
+    @execution_time = (@created_at - @time).round(2)
   end
 
   @@log = []
